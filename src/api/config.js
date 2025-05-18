@@ -7,19 +7,12 @@ const api = axios.create({
   baseURL: `${baseURL}/api`,
   headers: {
     'Content-Type': 'application/json',
-  }
+  },
+  // Увеличиваем тайм-аут до 30 секунд для работы с Render
+  timeout: 30000
 });
 
-// Добавляем интерцептор для добавления токена авторизации
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+// Примечание: мы убрали interceptor для авторизации, 
+// так как решили не использовать токены для упрощения
 
 export default api; 

@@ -1,29 +1,27 @@
 import React, { createContext, useState, useEffect } from 'react';
-import axios from 'axios';
 import api from '../api/config';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-const API_ENDPOINT = `${API_URL}/api`;
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token') || null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Проверка авторизации при загрузке
   useEffect(() => {
     const checkAuth = async () => {
-      if (token) {
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      if (isLoggedIn) {
         try {
-          const res = await api.get('/auth/me');
-          setUser(res.data.user);
+          const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+          setUser(userData);
         } catch (err) {
           console.error('Ошибка проверки авторизации:', err);
-          localStorage.removeItem('token');
-          setToken(null);
+          localStorage.removeItem('isLoggedIn');
+          localStorage.removeItem('userData');
           setUser(null);
         }
       }
@@ -31,15 +29,15 @@ export const AuthProvider = ({ children }) => {
     };
 
     checkAuth();
-  }, [token]);
+  }, []);
 
   // Регистрация
   const register = async (username, password) => {
     try {
       setError(null);
       const res = await api.post('/auth/register', { username, password });
-      localStorage.setItem('token', res.data.token);
-      setToken(res.data.token);
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('userData', JSON.stringify(res.data.user));
       setUser(res.data.user);
       return res.data;
     } catch (err) {
@@ -52,12 +50,17 @@ export const AuthProvider = ({ children }) => {
   const login = async (username, password) => {
     try {
       setError(null);
+      console.log("Отправляю запрос на логин:", { username, password });
       const res = await api.post('/auth/login', { username, password });
-      localStorage.setItem('token', res.data.token);
-      setToken(res.data.token);
+      console.log("Получен ответ:", res.data);
+      
+      // Сохраняем данные пользователя без использования токена
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('userData', JSON.stringify(res.data.user));
       setUser(res.data.user);
       return res.data;
     } catch (err) {
+      console.error("Ошибка логина:", err);
       setError(err.response?.data?.message || 'Ошибка входа');
       throw err;
     }
@@ -65,8 +68,8 @@ export const AuthProvider = ({ children }) => {
 
   // Выход
   const logout = () => {
-    localStorage.removeItem('token');
-    setToken(null);
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userData');
     setUser(null);
   };
 
@@ -75,6 +78,9 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null);
       const res = await api.put('/users/profile', formData);
+      
+      // Обновляем данные пользователя
+      localStorage.setItem('userData', JSON.stringify(res.data.user));
       setUser(res.data.user);
       return res.data;
     } catch (err) {
@@ -92,7 +98,6 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
-        token,
         loading,
         error,
         register,
