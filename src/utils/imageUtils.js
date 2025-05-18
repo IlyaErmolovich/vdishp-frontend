@@ -4,16 +4,22 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
  * Формирует полный URL для изображения
  * @param {string|boolean|object} imageData - данные изображения или ID аватара
  * @param {string} fallback - запасное изображение, если данные не переданы
- * @param {number} userId - ID пользователя (используется с флагом avatar=true)
+ * @param {number} id - ID пользователя или игры
+ * @param {string} type - тип изображения ('user' или 'game')
  * @returns {string} полный URL к изображению
  */
-export const getImageUrl = (imageData, fallback = '/placeholder-game.jpg', userId = null) => {
+export const getImageUrl = (imageData, fallback = '/placeholder-game.jpg', id = null, type = 'user') => {
   // Если данных нет, возвращаем запасное изображение
   if (!imageData) return fallback;
   
   // Если это булево значение true (новый формат аватаров)
-  if (imageData === true && userId) {
-    return `${API_URL}/api/users/avatar/${userId}?t=${new Date().getTime()}`; // Добавляем timestamp для предотвращения кэширования
+  if (imageData === true && id && type === 'user') {
+    return `${API_URL}/api/users/avatar/${id}?t=${new Date().getTime()}`; // Добавляем timestamp для предотвращения кэширования
+  }
+  
+  // Обработка обложек игр
+  if (imageData === true && id && type === 'game') {
+    return `${API_URL}/api/games/cover/${id}?t=${new Date().getTime()}`;
   }
   
   // Если это объект с полем avatar_id (новый формат)
