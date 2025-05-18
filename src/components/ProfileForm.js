@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef } from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { AuthContext } from '../context/AuthContext';
 import { getImageUrl } from '../utils/imageUtils';
@@ -167,11 +167,45 @@ const ProfileForm = ({ userData }) => {
   const { user, updateProfile } = useContext(AuthContext);
   const [username, setUsername] = useState(userData?.user?.username || user?.username || '');
   const [avatar, setAvatar] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(userData?.user?.avatar ? getImageUrl(userData.user.avatar) :
-    user?.avatar ? getImageUrl(user.avatar) : null);
+  
+  // Получаем URL аватара
+  const getUserAvatarUrl = () => {
+    // Проверяем userData
+    if (userData?.user?.avatar && userData?.user?.avatar_id) {
+      // Новый формат
+      return getImageUrl({ avatar: true, avatar_id: userData.user.avatar_id });
+    } else if (userData?.user?.avatar === true && userData?.user?.id) {
+      // Другой новый формат - булево значение с ID
+      return getImageUrl(true, null, userData.user.id);
+    } else if (userData?.user?.avatar) {
+      // Старый формат - путь к файлу
+      return getImageUrl(userData.user.avatar);
+    }
+    
+    // Проверяем user из контекста
+    if (user?.avatar && user?.avatar_id) {
+      return getImageUrl({ avatar: true, avatar_id: user.avatar_id });
+    } else if (user?.avatar === true && user?.id) {
+      return getImageUrl(true, null, user.id);
+    } else if (user?.avatar) {
+      return getImageUrl(user.avatar);
+    }
+    
+    return null;
+  };
+  
+  const [previewUrl, setPreviewUrl] = useState(getUserAvatarUrl());
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Обновляем URL аватара при изменении пользователя
+  useEffect(() => {
+    const avatarUrl = getUserAvatarUrl();
+    if (avatarUrl && !avatar) { // Не обновляем, если уже выбран новый аватар
+      setPreviewUrl(avatarUrl);
+    }
+  }, [user, userData]);
   
   const fileInputRef = useRef();
 
