@@ -269,11 +269,11 @@ const GamePage = () => {
   return (
     <PageContainer>
       <GameHeader>
-        <BackgroundImage image={getImageUrl(game.cover_image && game.cover_image !== 'placeholder', '/placeholder-game.jpg', game.id, 'game')} />
+        <BackgroundImage image={getImageUrl(true, '/placeholder-game.jpg', game.id, 'game')} />
         <GameContent>
           <GameCover>
             <img 
-              src={getImageUrl(game.cover_image && game.cover_image !== 'placeholder', '/placeholder-game.jpg', game.id, 'game')} 
+              src={getImageUrl(true, '/placeholder-game.jpg', game.id, 'game')} 
               alt={game.title} 
             />
           </GameCover>

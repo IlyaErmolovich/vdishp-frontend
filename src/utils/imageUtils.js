@@ -9,40 +9,28 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
  * @returns {string} полный URL к изображению
  */
 export const getImageUrl = (imageData, fallback = '/placeholder-game.jpg', id = null, type = 'user') => {
-  // Если данных нет, возвращаем запасное изображение
-  if (!imageData || imageData === 'placeholder' || imageData === '{}' || imageData === 'null') return fallback;
+  console.log('getImageUrl вызван с данными:', { imageData, id, type });
   
-  // Если это булево значение true (новый формат аватаров)
-  if (imageData === true && id && type === 'user') {
-    return `${API_URL}/api/users/avatar/${id}?t=${new Date().getTime()}`; // Добавляем timestamp для предотвращения кэширования
+  // Если imageData полностью отсутствует или равен placeholder, используем запасное изображение
+  if (!imageData || imageData === 'placeholder' || imageData === '{}' || imageData === 'null') {
+    console.log('Используем запасное изображение');
+    return fallback;
   }
   
-  // Обработка обложек игр
-  if ((imageData === true || typeof imageData === 'string') && id && type === 'game') {
+  // Для отображения обложек игр
+  if (type === 'game' && id) {
+    console.log('Загружаем изображение игры, ID:', id);
     return `${API_URL}/api/games/cover/${id}?t=${new Date().getTime()}`;
   }
   
-  // Если это объект с полем avatar_id (новый формат)
-  if (typeof imageData === 'object' && imageData.avatar && imageData.avatar_id) {
-    return `${API_URL}/api/users/avatar/${imageData.avatar_id}?t=${new Date().getTime()}`;
+  // Для аватаров пользователей
+  if (type === 'user' && id) {
+    console.log('Загружаем аватар пользователя, ID:', id);
+    return `${API_URL}/api/users/avatar/${id}?t=${new Date().getTime()}`;
   }
   
-  // Если есть поле avatar_id напрямую (для совместимости с новым форматом)
-  if (typeof imageData === 'object' && imageData.avatar_id) {
-    return `${API_URL}/api/users/avatar/${imageData.avatar_id}?t=${new Date().getTime()}`;
-  }
-  
-  // Если путь уже полный URL, возвращаем его
-  if (typeof imageData === 'string' && imageData.startsWith('http')) {
-    return imageData;
-  }
-  
-  // Для обратной совместимости со старыми путями к файлам
-  if (typeof imageData === 'string') {
-    return `${API_URL}${imageData}`;
-  }
-  
-  // В остальных случаях возвращаем запасное изображение
+  // Если дошли сюда, возвращаем запасное изображение
+  console.log('Не смогли определить тип изображения, используем запасное');
   return fallback;
 };
 
