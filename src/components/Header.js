@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { AuthContext } from '../context/AuthContext';
+import { getImageUrl } from '../utils/imageUtils';
 
 const HeaderContainer = styled.header`
   background-color: rgba(29, 29, 31, 0.9);
@@ -247,7 +248,7 @@ const Header = () => {
               <UserButton onClick={toggleUserMenu}>
                 {user.avatar ? (
                   <img 
-                    src={`http://localhost:5000${user.avatar}`} 
+                    src={getImageUrl(user.avatar)} 
                     alt={`${user.username}'s avatar`} 
                   />
                 ) : (

@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+import { getImageUrl } from '../utils/imageUtils';
 
 const ReviewsContainer = styled.div`
   margin-top: 30px;
@@ -119,7 +120,7 @@ const ReviewList = ({ reviews, gameId, onReviewDeleted }) => {
               <UserInfo>
                 <UserAvatar>
                   {review.avatar ? (
-                    <img src={`http://localhost:5000${review.avatar}`} alt={review.username} />
+                    <img src={getImageUrl(review.avatar)} alt={review.username} />
                   ) : (
                     <div style={{ background: '#4B0082', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
                       {review.username.charAt(0).toUpperCase()}

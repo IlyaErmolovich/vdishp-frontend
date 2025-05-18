@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { getImageUrl } from '../utils/imageUtils';
 
 const Card = styled.div`
   background-color: rgba(29, 29, 31, 0.7);
@@ -180,7 +181,7 @@ const GameCard = ({ game }) => {
       <Card>
         <CardImage>
           <img 
-            src={game.cover_image ? `http://localhost:5000${game.cover_image}` : '/placeholder-game.jpg'} 
+            src={getImageUrl(game.cover_image, '/placeholder-game.jpg')} 
             alt={game.title} 
           />
           <ReleaseDate>{formatDate(game.release_date)}</ReleaseDate>

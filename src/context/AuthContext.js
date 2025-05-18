@@ -1,7 +1,9 @@
 import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import api from '../api/config';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_ENDPOINT = `${API_URL}/api`;
 
 export const AuthContext = createContext();
 
@@ -11,18 +13,12 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Настройка axios
-  axios.defaults.baseURL = API_URL;
-  if (token) {
-    axios.defaults.headers.common['x-auth-token'] = token;
-  }
-
   // Проверка авторизации при загрузке
   useEffect(() => {
     const checkAuth = async () => {
       if (token) {
         try {
-          const res = await axios.get('/auth/me');
+          const res = await api.get('/auth/me');
           setUser(res.data.user);
         } catch (err) {
           console.error('Ошибка проверки авторизации:', err);
@@ -41,7 +37,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (username, password) => {
     try {
       setError(null);
-      const res = await axios.post('/auth/register', { username, password });
+      const res = await api.post('/auth/register', { username, password });
       localStorage.setItem('token', res.data.token);
       setToken(res.data.token);
       setUser(res.data.user);
@@ -56,7 +52,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (username, password) => {
     try {
       setError(null);
-      const res = await axios.post('/auth/login', { username, password });
+      const res = await api.post('/auth/login', { username, password });
       localStorage.setItem('token', res.data.token);
       setToken(res.data.token);
       setUser(res.data.user);
@@ -72,14 +68,13 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     setToken(null);
     setUser(null);
-    delete axios.defaults.headers.common['x-auth-token'];
   };
 
   // Обновление профиля
   const updateProfile = async (formData) => {
     try {
       setError(null);
-      const res = await axios.put('/users/profile', formData);
+      const res = await api.put('/users/profile', formData);
       setUser(res.data.user);
       return res.data;
     } catch (err) {
@@ -105,6 +100,7 @@ export const AuthProvider = ({ children }) => {
         logout,
         updateProfile,
         isAdmin,
+        apiUrl: API_URL,
       }}
     >
       {children}

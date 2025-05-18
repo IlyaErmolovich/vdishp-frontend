@@ -5,6 +5,7 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import ReviewForm from '../components/ReviewForm';
 import ReviewList from '../components/ReviewList';
+import { getImageUrl } from '../utils/imageUtils';
 
 const PageContainer = styled.div`
   padding: 0 15px;
@@ -268,11 +269,11 @@ const GamePage = () => {
   return (
     <PageContainer>
       <GameHeader>
-        <BackgroundImage image={game.cover_image ? `http://localhost:5000${game.cover_image}` : '/placeholder-game.jpg'} />
+        <BackgroundImage image={game.cover_image ? getImageUrl(game.cover_image) : '/placeholder-game.jpg'} />
         <GameContent>
           <GameCover>
             <img 
-              src={game.cover_image ? `http://localhost:5000${game.cover_image}` : '/placeholder-game.jpg'} 
+              src={game.cover_image ? getImageUrl(game.cover_image) : '/placeholder-game.jpg'} 
               alt={game.title} 
             />
           </GameCover>

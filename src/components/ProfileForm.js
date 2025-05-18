@@ -1,6 +1,7 @@
 import React, { useState, useContext, useRef } from 'react';
 import styled from 'styled-components';
 import { AuthContext } from '../context/AuthContext';
+import { getImageUrl } from '../utils/imageUtils';
 
 const FormContainer = styled.div`
   max-width: 600px;
@@ -166,8 +167,8 @@ const ProfileForm = ({ userData }) => {
   const { user, updateProfile } = useContext(AuthContext);
   const [username, setUsername] = useState(userData?.user?.username || user?.username || '');
   const [avatar, setAvatar] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(userData?.user?.avatar ? `http://localhost:5000${userData.user.avatar}` : 
-                                             user?.avatar ? `http://localhost:5000${user.avatar}` : null);
+  const [previewUrl, setPreviewUrl] = useState(userData?.user?.avatar ? getImageUrl(userData.user.avatar) :
+    user?.avatar ? getImageUrl(user.avatar) : null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);

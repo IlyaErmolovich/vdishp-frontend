@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import AdminGameForm from '../components/AdminGameForm';
+import { getImageUrl } from '../utils/imageUtils';
 
 const PageContainer = styled.div`
   max-width: 98%;
@@ -322,7 +323,7 @@ const AdminPage = () => {
                 <TableRow key={game.id}>
                   <TableCell>
                     <GameCover 
-                      src={game.cover_image ? `http://localhost:5000${game.cover_image}` : '/placeholder-game.jpg'} 
+                      src={game.cover_image ? getImageUrl(game.cover_image) : '/placeholder-game.jpg'} 
                       alt={game.title} 
                     />
                   </TableCell>
@@ -353,7 +354,7 @@ const AdminPage = () => {
           <GameCard key={game.id}>
             <GameCardHeader>
               <GameCover 
-                src={game.cover_image ? `http://localhost:5000${game.cover_image}` : '/placeholder-game.jpg'} 
+                src={game.cover_image ? getImageUrl(game.cover_image) : '/placeholder-game.jpg'} 
                 alt={game.title} 
               />
               <GameCardInfo>
