@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import axios from 'axios';
+import api from '../api/config';
 
 const FilterButtonContainer = styled.div`
   display: flex;
@@ -246,12 +246,12 @@ const GameFilter = ({ onFilterChange }) => {
   useEffect(() => {
     const fetchFilterData = async () => {
       try {
-        const [genresRes, platformsRes] = await Promise.all([
-          axios.get('/games/genres/all'),
-          axios.get('/games/platforms/all')
+        const [genresResponse, platformsResponse] = await Promise.all([
+          api.get('/games/genres/all'),
+          api.get('/games/platforms/all')
         ]);
-        setGenres(genresRes.data);
-        setPlatforms(platformsRes.data);
+        setGenres(genresResponse.data);
+        setPlatforms(platformsResponse.data);
       } catch (error) {
         console.error('Ошибка загрузки данных для фильтра:', error);
       }

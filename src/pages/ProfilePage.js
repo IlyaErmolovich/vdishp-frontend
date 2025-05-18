@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { AuthContext } from '../context/AuthContext';
 import ProfileForm from '../components/ProfileForm';
-import axios from 'axios';
+import api from '../api/config';
 
 const PageContainer = styled.div`
   max-width: 800px;
@@ -49,7 +49,7 @@ const ProfilePage = () => {
         setLoading(true);
         setError(null);
         
-        const response = await axios.get('/users/profile');
+        const response = await api.get('/users/profile');
         setUserData(response.data);
       } catch (err) {
         setError('Не удалось загрузить данные профиля. Пожалуйста, попробуйте позже.');

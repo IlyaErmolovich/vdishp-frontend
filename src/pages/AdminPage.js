@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import axios from 'axios';
+import api from '../api/config';
 import { AuthContext } from '../context/AuthContext';
 import AdminGameForm from '../components/AdminGameForm';
 import { getImageUrl } from '../utils/imageUtils';
@@ -204,7 +204,7 @@ const AdminPage = () => {
         setLoading(true);
         setError(null);
         
-        const response = await axios.get('/games');
+        const response = await api.get('/games');
         setGames(response.data);
       } catch (err) {
         setError('Не удалось загрузить список игр. Пожалуйста, попробуйте позже.');
@@ -235,7 +235,7 @@ const AdminPage = () => {
   const handleDeleteGame = async (gameId) => {
     if (window.confirm('Вы уверены, что хотите удалить эту игру? Это действие невозможно отменить.')) {
       try {
-        await axios.delete(`/games/${gameId}`);
+        await api.delete(`/games/${gameId}`);
         
         // Обновляем список игр
         setGames(prev => prev.filter(game => game.id !== gameId));
@@ -253,7 +253,7 @@ const AdminPage = () => {
     
     // Перезагружаем список игр
     setLoading(true);
-    axios.get('/games')
+    api.get('/games')
       .then(response => {
         setGames(response.data);
         setLoading(false);

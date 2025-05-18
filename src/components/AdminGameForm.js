@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import axios from 'axios';
+import api from '../api/config';
 import { getImageUrl } from '../utils/imageUtils';
 
 const FormContainer = styled.div`
@@ -191,8 +191,8 @@ const AdminGameForm = ({ game = null, onGameAdded, onGameUpdated }) => {
     const fetchData = async () => {
       try {
         const [genresRes, platformsRes] = await Promise.all([
-          axios.get('/games/genres/all'),
-          axios.get('/games/platforms/all')
+          api.get('/games/genres/all'),
+          api.get('/games/platforms/all')
         ]);
         setGenres(genresRes.data);
         setPlatforms(platformsRes.data);
@@ -281,12 +281,12 @@ const AdminGameForm = ({ game = null, onGameAdded, onGameUpdated }) => {
       let response;
       if (game) {
         // Обновление существующей игры
-        response = await axios.put(`/games/${game.id}`, formData);
+        response = await api.put(`/games/${game.id}`, formData);
         setSuccess('Игра успешно обновлена');
         if (onGameUpdated) onGameUpdated(response.data.game);
       } else {
         // Создание новой игры
-        response = await axios.post('/games', formData);
+        response = await api.post('/games', formData);
         setSuccess('Игра успешно добавлена');
         
         // Сброс формы

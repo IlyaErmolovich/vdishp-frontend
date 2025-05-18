@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styled from 'styled-components';
-import axios from 'axios';
+import api from '../api/config';
 import GameCard from '../components/GameCard';
 import GameFilter from '../components/GameFilter';
 
@@ -128,7 +128,7 @@ const HomePage = () => {
         setPage(1);
         
         const params = { ...filters, page: 1, limit: 12 };
-        const response = await axios.get('/games', { params });
+        const response = await api.get('/games', { params });
         
         setGames(response.data);
         setHasMore(response.data.length === 12);
@@ -153,7 +153,7 @@ const HomePage = () => {
       const nextPage = page + 1;
       
       const params = { ...filters, page: nextPage, limit: 12 };
-      const response = await axios.get('/games', { params });
+      const response = await api.get('/games', { params });
       
       if (response.data.length > 0) {
         setGames(prevGames => [...prevGames, ...response.data]);

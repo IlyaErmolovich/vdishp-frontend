@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import axios from 'axios';
+import api from '../api/config';
 import { AuthContext } from '../context/AuthContext';
 import ReviewForm from '../components/ReviewForm';
 import ReviewList from '../components/ReviewList';
@@ -209,8 +209,8 @@ const GamePage = () => {
         
         // Параллельно запрашиваем данные игры и отзывы
         const [gameResponse, reviewsResponse] = await Promise.all([
-          axios.get(`/games/${id}`),
-          axios.get(`/reviews/game/${id}`)
+          api.get(`/games/${id}`),
+          api.get(`/reviews/game/${id}`)
         ]);
         
         setGame(gameResponse.data);
@@ -229,7 +229,7 @@ const GamePage = () => {
   const handleReviewAdded = async () => {
     try {
       // Обновляем список отзывов
-      const response = await axios.get(`/reviews/game/${id}`);
+      const response = await api.get(`/reviews/game/${id}`);
       setReviews(response.data);
     } catch (err) {
       console.error('Error refreshing reviews:', err);
@@ -243,7 +243,7 @@ const GamePage = () => {
   const handleDeleteGame = async () => {
     if (window.confirm('Вы уверены, что хотите удалить эту игру? Это действие невозможно отменить.')) {
       try {
-        await axios.delete(`/games/${id}`);
+        await api.delete(`/games/${id}`);
         navigate('/');
       } catch (err) {
         alert('Ошибка при удалении игры');

@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
-import axios from 'axios';
+import api from '../api/config';
 import { AuthContext } from '../context/AuthContext';
 import { getImageUrl } from '../utils/imageUtils';
 
@@ -95,7 +95,7 @@ const ReviewList = ({ reviews, gameId, onReviewDeleted }) => {
 
   const handleDeleteReview = async (reviewId) => {
     try {
-      await axios.delete(`/reviews/${reviewId}`);
+      await api.delete(`/reviews/${reviewId}`);
       onReviewDeleted(reviewId);
     } catch (err) {
       setError(err.response?.data?.message || 'Ошибка при удалении отзыва');
