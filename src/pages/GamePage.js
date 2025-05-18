@@ -201,6 +201,19 @@ const GamePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Функция для обработки жанров/платформ
+  const processGenres = (data) => {
+    if (!data) return [];
+    
+    // Если строка, разбиваем по разделителям
+    if (typeof data === 'string') {
+      return data.split(/[,|]/);
+    }
+    
+    // Уже массив
+    return data;
+  };
+
   useEffect(() => {
     const fetchGameData = async () => {
       try {
@@ -231,19 +244,6 @@ const GamePage = () => {
       } finally {
         setLoading(false);
       }
-    };
-
-    // Функция для обработки жанров/платформ
-    const processGenres = (data) => {
-      if (!data) return [];
-      
-      // Если строка, разбиваем по разделителям
-      if (typeof data === 'string') {
-        return data.split(/[,|]/);
-      }
-      
-      // Уже массив
-      return data;
     };
 
     fetchGameData();
