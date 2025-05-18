@@ -213,7 +213,17 @@ const GamePage = () => {
           api.get(`/reviews/game/${id}`)
         ]);
         
-        setGame(gameResponse.data);
+        console.log('Received game data:', gameResponse.data);
+        console.log('Genres from API:', gameResponse.data.genres);
+        
+        // Проверяем и обрабатываем жанры
+        const processedGame = {
+          ...gameResponse.data,
+          genres: processGenres(gameResponse.data.genres),
+          platforms: processGenres(gameResponse.data.platforms)
+        };
+        
+        setGame(processedGame);
         setReviews(reviewsResponse.data);
       } catch (err) {
         setError('Не удалось загрузить информацию об игре. Пожалуйста, попробуйте позже.');
@@ -221,6 +231,19 @@ const GamePage = () => {
       } finally {
         setLoading(false);
       }
+    };
+
+    // Функция для обработки жанров/платформ
+    const processGenres = (data) => {
+      if (!data) return [];
+      
+      // Если строка, разбиваем по разделителям
+      if (typeof data === 'string') {
+        return data.split(/[,|]/);
+      }
+      
+      // Уже массив
+      return data;
     };
 
     fetchGameData();
@@ -266,14 +289,18 @@ const GamePage = () => {
     return <ErrorMessage>{error || 'Игра не найдена'}</ErrorMessage>;
   }
 
+  // Получаем обработанные жанры и платформы
+  const genres = processGenres(game.genres);
+  const platforms = processGenres(game.platforms);
+
   return (
     <PageContainer>
       <GameHeader>
-        <BackgroundImage image={`/placeholder-game.jpg`} />
+        <BackgroundImage image="https://via.placeholder.com/1200x600.png?text=Game+Background" />
         <GameContent>
           <GameCover>
             <img 
-              src={`/placeholder-game.jpg`} 
+              src="https://via.placeholder.com/300x400.png?text=Game+Cover" 
               alt={game.title} 
             />
           </GameCover>
@@ -293,10 +320,10 @@ const GamePage = () => {
             </GameDetails>
             
             <TagsContainer>
-              {game.genres && game.genres.length > 0 ? game.genres.map((genre, index) => (
+              {genres && genres.length > 0 ? genres.map((genre, index) => (
                 <Tag key={index}>{genre}</Tag>
               )) : <Tag>Без жанра</Tag>}
-              {game.platforms && game.platforms.length > 0 ? game.platforms.map((platform, index) => (
+              {platforms && platforms.length > 0 ? platforms.map((platform, index) => (
                 <PlatformTag key={`p-${index}`}>{platform}</PlatformTag>
               )) : null}
             </TagsContainer>

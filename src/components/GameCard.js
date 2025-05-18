@@ -161,6 +161,11 @@ const GameRating = styled.div`
 `;
 
 const GameCard = ({ game }) => {
+  // Отладка для проверки данных игры
+  console.log('GameCard render for:', game.title);
+  console.log('Genres:', game.genres);
+  console.log('Platforms:', game.platforms);
+
   // Форматирование даты
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -176,12 +181,27 @@ const GameCard = ({ game }) => {
 
   const rating = calculateRating();
 
+  // Проверка и обработка жанров - убедимся, что они всегда массив
+  const processGenres = () => {
+    if (!game.genres) return [];
+    
+    // Если строка, пытаемся разбить ее
+    if (typeof game.genres === 'string') {
+      return game.genres.split(/[,|]/);
+    }
+    
+    // Уже массив
+    return game.genres;
+  };
+
+  const genres = processGenres();
+
   return (
     <Link to={`/game/${game.id}`} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
       <Card>
         <CardImage>
           <img 
-            src={`/placeholder-game.jpg`} 
+            src="https://via.placeholder.com/300x200.png?text=Game+Image" 
             alt={game.title} 
           />
           <ReleaseDate>{formatDate(game.release_date)}</ReleaseDate>
@@ -193,7 +213,7 @@ const GameCard = ({ game }) => {
             <div>Разработчик: {game.developper}</div>
           </CardInfo>
           <CardTags>
-            {game.genres && game.genres.length > 0 ? game.genres.map((genre, index) => (
+            {genres && genres.length > 0 ? genres.map((genre, index) => (
               <Tag key={index}>{genre}</Tag>
             )) : <Tag>Без жанра</Tag>}
             {game.platforms && game.platforms.length > 0 ? game.platforms.map((platform, index) => (
