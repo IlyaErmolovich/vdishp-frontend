@@ -206,12 +206,17 @@ const ProfileForm = ({ userData }) => {
       formData.append('username', username);
       
       if (avatar) {
+        // Убедимся, что имя поля точно совпадает с тем, что ожидает multer
         formData.append('avatar', avatar);
+        console.log('Добавляем файл аватара:', avatar.name);
       }
       
-      await updateProfile(formData);
+      console.log('Отправляем запрос на обновление профиля');
+      const result = await updateProfile(formData);
+      console.log('Результат обновления:', result);
       setSuccess('Профиль успешно обновлен');
     } catch (err) {
+      console.error('Ошибка обновления профиля:', err);
       setError(err.response?.data?.message || 'Произошла ошибка при обновлении профиля');
     } finally {
       setIsSubmitting(false);

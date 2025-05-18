@@ -77,13 +77,23 @@ export const AuthProvider = ({ children }) => {
   const updateProfile = async (formData) => {
     try {
       setError(null);
-      const res = await api.put('/users/profile', formData);
+      console.log('FormData содержимое:', [...formData.entries()]);
+      
+      // Важно: для FormData нужны правильные заголовки
+      const res = await api.put('/users/profile', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      console.log('Ответ обновления профиля:', res.data);
       
       // Обновляем данные пользователя
       localStorage.setItem('userData', JSON.stringify(res.data.user));
       setUser(res.data.user);
       return res.data;
     } catch (err) {
+      console.error('Ошибка при обновлении профиля:', err);
       setError(err.response?.data?.message || 'Ошибка обновления профиля');
       throw err;
     }
