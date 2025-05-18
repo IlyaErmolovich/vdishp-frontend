@@ -10,7 +10,7 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
  */
 export const getImageUrl = (imageData, fallback = '/placeholder-game.jpg', id = null, type = 'user') => {
   // Если данных нет, возвращаем запасное изображение
-  if (!imageData) return fallback;
+  if (!imageData || imageData === 'placeholder' || imageData === '{}' || imageData === 'null') return fallback;
   
   // Если это булево значение true (новый формат аватаров)
   if (imageData === true && id && type === 'user') {
@@ -18,7 +18,7 @@ export const getImageUrl = (imageData, fallback = '/placeholder-game.jpg', id = 
   }
   
   // Обработка обложек игр
-  if (imageData === true && id && type === 'game') {
+  if ((imageData === true || typeof imageData === 'string') && id && type === 'game') {
     return `${API_URL}/api/games/cover/${id}?t=${new Date().getTime()}`;
   }
   
