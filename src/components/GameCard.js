@@ -181,7 +181,7 @@ const GameCard = ({ game }) => {
       <Card>
         <CardImage>
           <img 
-            src={getImageUrl(null, '/placeholder-game.jpg', game.id, 'game')} 
+            src={`/placeholder-game.jpg`} 
             alt={game.title} 
           />
           <ReleaseDate>{formatDate(game.release_date)}</ReleaseDate>
@@ -193,12 +193,12 @@ const GameCard = ({ game }) => {
             <div>Разработчик: {game.developper}</div>
           </CardInfo>
           <CardTags>
-            {game.genres && game.genres.slice(0, 3).map((genre, index) => (
+            {game.genres && game.genres.length > 0 ? game.genres.map((genre, index) => (
               <Tag key={index}>{genre}</Tag>
-            ))}
-            {game.platforms && game.platforms.slice(0, 2).map((platform, index) => (
+            )) : <Tag>Без жанра</Tag>}
+            {game.platforms && game.platforms.length > 0 ? game.platforms.map((platform, index) => (
               <PlatformTag key={`p-${index}`}>{platform}</PlatformTag>
-            ))}
+            )) : null}
           </CardTags>
         </CardContent>
       </Card>

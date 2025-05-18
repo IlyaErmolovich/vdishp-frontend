@@ -128,13 +128,23 @@ const HomePage = () => {
         setPage(1);
         
         const params = { ...filters, page: 1, limit: 12 };
-        const response = await api.get('/games', { params });
+        console.log('Попытка загрузки игр с параметрами:', params);
         
-        setGames(response.data);
-        setHasMore(response.data.length === 12);
+        try {
+          const response = await api.get('/games', { params });
+          setGames(response.data);
+          setHasMore(response.data.length === 12);
+          console.log('Успешно загружено игр:', response.data.length);
+        } catch (apiError) {
+          console.error('Ошибка загрузки игр:', apiError);
+          
+          // Устанавливаем пустой массив и отображаем ошибку
+          setGames([]);
+          setError('Не удалось загрузить игры. Пожалуйста, попробуйте позже.');
+        }
       } catch (err) {
+        console.error('Неожиданная ошибка:', err);
         setError('Не удалось загрузить игры. Пожалуйста, попробуйте позже.');
-        console.error('Error fetching games:', err);
       } finally {
         setLoading(false);
         setInitialLoading(false);

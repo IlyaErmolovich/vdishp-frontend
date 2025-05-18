@@ -269,11 +269,11 @@ const GamePage = () => {
   return (
     <PageContainer>
       <GameHeader>
-        <BackgroundImage image={getImageUrl(null, '/placeholder-game.jpg', game.id, 'game')} />
+        <BackgroundImage image={`/placeholder-game.jpg`} />
         <GameContent>
           <GameCover>
             <img 
-              src={getImageUrl(null, '/placeholder-game.jpg', game.id, 'game')} 
+              src={`/placeholder-game.jpg`} 
               alt={game.title} 
             />
           </GameCover>
@@ -293,12 +293,12 @@ const GamePage = () => {
             </GameDetails>
             
             <TagsContainer>
-              {game.genres && game.genres.map((genre, index) => (
+              {game.genres && game.genres.length > 0 ? game.genres.map((genre, index) => (
                 <Tag key={index}>{genre}</Tag>
-              ))}
-              {game.platforms && game.platforms.map((platform, index) => (
+              )) : <Tag>Без жанра</Tag>}
+              {game.platforms && game.platforms.length > 0 ? game.platforms.map((platform, index) => (
                 <PlatformTag key={`p-${index}`}>{platform}</PlatformTag>
-              ))}
+              )) : null}
             </TagsContainer>
             
             {isAdmin() && (
