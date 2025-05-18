@@ -1,4 +1,4 @@
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_URL = process.env.REACT_APP_API_URL || 'https://vdishp-backend.onrender.com';
 
 /**
  * Формирует полный URL для изображения
@@ -9,28 +9,38 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
  * @returns {string} полный URL к изображению
  */
 export const getImageUrl = (imageData, fallback = '/placeholder-game.jpg', id = null, type = 'user') => {
-  console.log('getImageUrl вызван с данными:', { imageData, id, type });
-  
-  // Если imageData полностью отсутствует или равен placeholder, используем запасное изображение
-  if (!imageData || imageData === 'placeholder' || imageData === '{}' || imageData === 'null') {
-    console.log('Используем запасное изображение');
-    return fallback;
-  }
-  
-  // Для отображения обложек игр
+  // Для обложек игр - всегда берем с сервера по ID
   if (type === 'game' && id) {
-    console.log('Загружаем изображение игры, ID:', id);
     return `${API_URL}/api/games/cover/${id}?t=${new Date().getTime()}`;
   }
-  
+
   // Для аватаров пользователей
-  if (type === 'user' && id) {
-    console.log('Загружаем аватар пользователя, ID:', id);
-    return `${API_URL}/api/users/avatar/${id}?t=${new Date().getTime()}`;
+  if (type === 'user') {
+    // Если есть ID, берем аватар с сервера
+    if (id) {
+      return `${API_URL}/api/users/avatar/${id}?t=${new Date().getTime()}`;
+    }
+    
+    // Поддержка разных форматов данных пользователя
+    if (imageData && typeof imageData === 'object') {
+      const userId = imageData.id || imageData.avatar_id || imageData.user_id;
+      if (userId) {
+        return `${API_URL}/api/users/avatar/${userId}?t=${new Date().getTime()}`;
+      }
+    }
   }
   
-  // Если дошли сюда, возвращаем запасное изображение
-  console.log('Не смогли определить тип изображения, используем запасное');
+  // Обработка строковых путей
+  if (imageData && typeof imageData === 'string') {
+    if (imageData.startsWith('http')) {
+      return imageData;
+    }
+    if (imageData !== 'placeholder' && imageData !== '{}' && imageData !== 'null') {
+      return `${API_URL}${imageData}`;
+    }
+  }
+  
+  // Заглушка по умолчанию
   return fallback;
 };
 

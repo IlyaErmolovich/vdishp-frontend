@@ -181,7 +181,7 @@ const GameCard = ({ game }) => {
       <Card>
         <CardImage>
           <img 
-            src={getImageUrl(true, '/placeholder-game.jpg', game.id, 'game')} 
+            src={getImageUrl(null, '/placeholder-game.jpg', game.id, 'game')} 
             alt={game.title} 
           />
           <ReleaseDate>{formatDate(game.release_date)}</ReleaseDate>
