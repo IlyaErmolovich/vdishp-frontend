@@ -82,147 +82,126 @@ const CardTitle = styled.h3`
   line-height: 1.3;
 `;
 
-const CardInfo = styled.div`
-  margin-bottom: 15px;
+const CardText = styled.p`
   color: ${props => props.theme.colors.textSecondary};
   font-size: ${props => props.theme.fontSizes.small};
-  opacity: 0.8;
+  margin-bottom: 10px;
+  line-height: 1.4;
+  flex-grow: 1;
 `;
 
-const CardTags = styled.div`
+const PillContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: auto;
+  margin-top: 8px;
 `;
 
-const Tag = styled.span`
-  background-color: rgba(32, 178, 170, 0.12);
-  color: ${props => props.theme.colors.primary};
-  padding: 5px 10px;
-  border-radius: ${props => props.theme.radius.small};
+const Pill = styled.span`
+  background: rgba(32, 178, 170, 0.1);
+  color: ${props => props.theme.colors.text};
   font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-weight: 500;
-  transition: all ${props => props.theme.transitions.short};
-  backdrop-filter: blur(5px);
+  padding: 4px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(32, 178, 170, 0.2);
   
   &:hover {
-    background-color: rgba(32, 178, 170, 0.25);
-    transform: translateY(-2px);
-  }
-`;
-
-const PlatformTag = styled(Tag)`
-  background-color: rgba(123, 104, 238, 0.12);
-  color: #9F91F6;
-  
-  &:hover {
-    background-color: rgba(123, 104, 238, 0.25);
+    background: rgba(32, 178, 170, 0.2);
   }
 `;
 
 const ReleaseDate = styled.div`
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 10px;
+  right: 10px;
   background-color: rgba(0, 0, 0, 0.7);
   color: ${props => props.theme.colors.text};
+  font-size: ${props => props.theme.fontSizes.xsmall};
   padding: 6px 10px;
-  border-radius: ${props => props.theme.radius.small};
-  font-size: 11px;
-  font-weight: 600;
+  border-radius: 4px;
   z-index: 2;
-  backdrop-filter: blur(5px);
-  border-left: 2px solid ${props => props.theme.colors.primary};
-  letter-spacing: 0.5px;
-`;
-
-const GameRating = styled.div`
-  position: absolute;
-  bottom: 15px;
-  left: 15px;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: ${props => props.theme.colors.warning};
-  padding: 6px 10px;
-  border-radius: ${props => props.theme.radius.small};
-  font-weight: 600;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  backdrop-filter: blur(5px);
-  
-  &:before {
-    content: '★';
-    color: ${props => props.theme.colors.warning};
-  }
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
 const GameCard = ({ game }) => {
-  // Отладка для проверки данных игры
-  console.log('GameCard render for:', game.title);
-  console.log('Genres:', game.genres);
-  console.log('Platforms:', game.platforms);
+  // Проверяем, что объект игры существует
+  if (!game) {
+    console.error('GameCard: объект игры не передан');
+    return null;
+  }
 
-  // Форматирование даты
+  // Форматируем дату
   const formatDate = (dateString) => {
+    if (!dateString) return 'Дата не указана';
     const date = new Date(dateString);
-    return date.toLocaleDateString('ru-RU');
+    return new Intl.DateTimeFormat('ru-RU', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }).format(date);
   };
 
-  // Если есть рейтинг, рассчитываем средний
-  const calculateRating = () => {
-    if (!game.reviews || game.reviews.length === 0) return null;
-    const sum = game.reviews.reduce((total, review) => total + review.rating, 0);
-    return (sum / game.reviews.length).toFixed(1);
+  // Ограничиваем количество отображаемых жанров/платформ
+  const limitItems = (items, limit = 3) => {
+    if (!items || !Array.isArray(items)) return [];
+    return items.slice(0, limit);
   };
 
-  const rating = calculateRating();
-
-  // Проверка и обработка жанров - убедимся, что они всегда массив
-  const processGenres = () => {
-    if (!game.genres) return [];
-    
-    // Если строка, пытаемся разбить ее
-    if (typeof game.genres === 'string') {
-      return game.genres.split(/[,|]/);
-    }
-    
-    // Уже массив
-    return game.genres;
-  };
-
-  const genres = processGenres();
+  // Получаем URL изображения, явно передавая ID игры
+  const imageUrl = getImageUrl(game.cover_image, '/placeholder-game.jpg', game.id, 'game');
+  console.log('GameCard: получили URL изображения для игры ID', game.id, ':', imageUrl);
 
   return (
-    <Link to={`/game/${game.id}`} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
-      <Card>
-        <CardImage>
-          <img 
-            src="https://via.placeholder.com/300x200.png?text=Game+Image" 
-            alt={game.title} 
-          />
-          <ReleaseDate>{formatDate(game.release_date)}</ReleaseDate>
-          {rating && <GameRating>{rating}</GameRating>}
-        </CardImage>
-        <CardContent>
-          <CardTitle>{game.title}</CardTitle>
-          <CardInfo>
-            <div>Разработчик: {game.developper}</div>
-          </CardInfo>
-          <CardTags>
-            {genres && genres.length > 0 ? genres.map((genre, index) => (
-              <Tag key={index}>{genre}</Tag>
-            )) : <Tag>Без жанра</Tag>}
-            {game.platforms && game.platforms.length > 0 ? game.platforms.map((platform, index) => (
-              <PlatformTag key={`p-${index}`}>{platform}</PlatformTag>
-            )) : null}
-          </CardTags>
-        </CardContent>
-      </Card>
-    </Link>
+    <Card>
+      <CardImage>
+        <img 
+          src={imageUrl} 
+          alt={game.title}
+          onError={(e) => {
+            console.error('Ошибка загрузки изображения для игры', game.id);
+            e.target.src = '/placeholder-game.jpg';
+          }}
+        />
+        {game.release_date && <ReleaseDate>{formatDate(game.release_date)}</ReleaseDate>}
+      </CardImage>
+      <CardContent>
+        <CardTitle>{game.title}</CardTitle>
+        <CardText>
+          {game.developer && <div><strong>Разработчик:</strong> {game.developer}</div>}
+          {game.publisher && <div><strong>Издатель:</strong> {game.publisher}</div>}
+          
+          {game.genres && game.genres.length > 0 && (
+            <PillContainer>
+              {limitItems(game.genres).map((genre, index) => (
+                <Pill key={index}>{genre}</Pill>
+              ))}
+              {game.genres.length > 3 && <Pill>+{game.genres.length - 3}</Pill>}
+            </PillContainer>
+          )}
+        </CardText>
+        <Link 
+          to={`/game/${game.id}`} 
+          className="button button-primary"
+          style={{ 
+            width: '100%', 
+            textAlign: 'center', 
+            marginTop: '10px',
+            backgroundColor: 'rgba(32, 178, 170, 0.8)',
+            padding: '10px',
+            borderRadius: '4px',
+            color: 'white',
+            textDecoration: 'none',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            transition: 'all 0.2s ease',
+            display: 'block'
+          }}
+        >
+          Подробнее
+        </Link>
+      </CardContent>
+    </Card>
   );
 };
 

@@ -13,19 +13,16 @@ export const AuthProvider = ({ children }) => {
   // Проверка авторизации при загрузке
   useEffect(() => {
     const checkAuth = async () => {
-      const isLoggedIn = localStorage.getItem('isLoggedIn');
-      if (isLoggedIn) {
-        try {
-          const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-          setUser(userData);
-        } catch (err) {
-          console.error('Ошибка проверки авторизации:', err);
-          localStorage.removeItem('isLoggedIn');
-          localStorage.removeItem('userData');
-          setUser(null);
-        }
+      try {
+        // Пытаемся получить данные текущего пользователя с сервера
+        const response = await api.get('/auth/me');
+        setUser(response.data.user);
+      } catch (err) {
+        console.error('Ошибка проверки авторизации:', err);
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     checkAuth();
@@ -36,8 +33,6 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null);
       const res = await api.post('/auth/register', { username, password });
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('userData', JSON.stringify(res.data.user));
       setUser(res.data.user);
       return res.data;
     } catch (err) {
@@ -54,9 +49,6 @@ export const AuthProvider = ({ children }) => {
       const res = await api.post('/auth/login', { username, password });
       console.log("Получен ответ:", res.data);
       
-      // Сохраняем данные пользователя без использования токена
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('userData', JSON.stringify(res.data.user));
       setUser(res.data.user);
       return res.data;
     } catch (err) {
@@ -67,10 +59,13 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Выход
-  const logout = () => {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userData');
-    setUser(null);
+  const logout = async () => {
+    try {
+      await api.post('/auth/logout');
+      setUser(null);
+    } catch (err) {
+      console.error("Ошибка выхода:", err);
+    }
   };
 
   // Обновление профиля
@@ -89,7 +84,6 @@ export const AuthProvider = ({ children }) => {
       console.log('Ответ обновления профиля:', res.data);
       
       // Обновляем данные пользователя
-      localStorage.setItem('userData', JSON.stringify(res.data.user));
       setUser(res.data.user);
       return res.data;
     } catch (err) {

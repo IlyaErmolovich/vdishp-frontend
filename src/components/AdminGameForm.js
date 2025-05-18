@@ -176,8 +176,23 @@ const AdminGameForm = ({ game = null, onGameAdded, onGameUpdated }) => {
   const [releaseDate, setReleaseDate] = useState(game ? game.release_date.split('T')[0] : '');
   const [coverImage, setCoverImage] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(game && game.cover_image ? getImageUrl(game.cover_image) : null);
-  const [selectedGenres, setSelectedGenres] = useState(game ? game.genres : []);
-  const [selectedPlatforms, setSelectedPlatforms] = useState(game ? game.platforms : []);
+  
+  // Process genres to ensure it's always an array
+  const processGenres = (genreData) => {
+    if (!genreData) return [];
+    if (typeof genreData === 'string') return genreData.split(/[,|]/);
+    return Array.isArray(genreData) ? genreData : [];
+  };
+  
+  // Process platforms to ensure it's always an array
+  const processPlatforms = (platformData) => {
+    if (!platformData) return [];
+    if (typeof platformData === 'string') return platformData.split(/[,|]/);
+    return Array.isArray(platformData) ? platformData : [];
+  };
+  
+  const [selectedGenres, setSelectedGenres] = useState(game ? processGenres(game.genres) : []);
+  const [selectedPlatforms, setSelectedPlatforms] = useState(game ? processPlatforms(game.platforms) : []);
   const [genres, setGenres] = useState([]);
   const [platforms, setPlatforms] = useState([]);
   const [error, setError] = useState('');

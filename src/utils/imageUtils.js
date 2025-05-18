@@ -8,40 +8,65 @@ const API_URL = process.env.REACT_APP_API_URL || 'https://vdishp-backend.onrende
  * @param {string} type - тип изображения ('user' или 'game')
  * @returns {string} полный URL к изображению
  */
-export const getImageUrl = (imageData, fallback = '/placeholder-game.jpg', id = null, type = 'user') => {
+export const getImageUrl = (imageData, fallback = '/placeholder-game.jpg', id = null, type = 'game') => {
+  // Добавляем случайный параметр к URL для предотвращения кэширования
+  const cacheParam = `?t=${new Date().getTime()}`;
+  
+  console.log('getImageUrl вызван с параметрами:', { imageData, fallback, id, type });
+  
   // Для обложек игр - всегда берем с сервера по ID
   if (type === 'game' && id) {
-    return `${API_URL}/api/games/cover/${id}?t=${new Date().getTime()}`;
+    const url = `${API_URL}/api/games/cover/${id}${cacheParam}`;
+    console.log('Возвращаем URL изображения игры:', url);
+    return url;
   }
 
   // Для аватаров пользователей
   if (type === 'user') {
     // Если есть ID, берем аватар с сервера
     if (id) {
-      return `${API_URL}/api/users/avatar/${id}?t=${new Date().getTime()}`;
+      const url = `${API_URL}/api/users/avatar/${id}${cacheParam}`;
+      console.log('Возвращаем URL аватара пользователя по ID:', url);
+      return url;
     }
     
     // Поддержка разных форматов данных пользователя
     if (imageData && typeof imageData === 'object') {
       const userId = imageData.id || imageData.avatar_id || imageData.user_id;
       if (userId) {
-        return `${API_URL}/api/users/avatar/${userId}?t=${new Date().getTime()}`;
+        const url = `${API_URL}/api/users/avatar/${userId}${cacheParam}`;
+        console.log('Возвращаем URL аватара пользователя из объекта:', url);
+        return url;
       }
     }
+  }
+  
+  // Проверяем, является ли imageData строкой 'placeholder'
+  if (imageData === 'placeholder' || imageData === '{}' || imageData === 'null' || !imageData) {
+    if (fallback.startsWith('http')) {
+      console.log('Возвращаем fallback URL:', fallback);
+      return fallback;
+    }
+    const url = fallback.startsWith('/') ? fallback : `/${fallback}`;
+    console.log('Возвращаем локальный fallback URL:', url);
+    return url;
   }
   
   // Обработка строковых путей
   if (imageData && typeof imageData === 'string') {
     if (imageData.startsWith('http')) {
+      console.log('Возвращаем полный URL из строки:', imageData);
       return imageData;
     }
-    if (imageData !== 'placeholder' && imageData !== '{}' && imageData !== 'null') {
-      return `${API_URL}${imageData}`;
-    }
+    const url = `${API_URL}${imageData.startsWith('/') ? '' : '/'}${imageData}`;
+    console.log('Возвращаем URL из строки с добавлением API_URL:', url);
+    return url;
   }
   
   // Заглушка по умолчанию
-  return fallback;
+  const url = fallback.startsWith('/') ? fallback : `/${fallback}`;
+  console.log('Возвращаем fallback URL по умолчанию:', url);
+  return url;
 };
 
 export default {
